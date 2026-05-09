@@ -2,7 +2,7 @@ import os
 import requests
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
-from core.protocols.identity_vault import IdentityVault
+from cc_empire.core.protocols.identity_vault import IdentityVault
 
 class NeuralMapRouter:
     """Routes emotional context and long-term memory to the Pinecone/Vector DB."""

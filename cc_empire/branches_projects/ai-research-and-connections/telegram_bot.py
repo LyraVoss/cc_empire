@@ -2,8 +2,8 @@ import os
 import asyncio
 import logging
 from telebot.async_telebot import AsyncTeleBot
-from core.protocols.nervous_system import NervousSystem
-from core.protocols.payment_handler import UniversalPaymentHandler
+from cc_empire.core.protocols.nervous_system import NervousSystem
+from cc_empire.core.protocols.payment_handler import UniversalPaymentHandler
 
 # Initialize Bot & Nervous System for Testing
 bot = AsyncTeleBot(os.getenv("TELEGRAM_TOKEN"))

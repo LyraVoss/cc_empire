@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
-from core.config import settings
+from cc_empire.core.config import settings
 
 class UniversalPaymentHandler:
     """
