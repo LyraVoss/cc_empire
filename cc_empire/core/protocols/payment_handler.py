@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
+from core.config import settings
 
 class UniversalPaymentHandler:
     """
@@ -12,7 +13,7 @@ class UniversalPaymentHandler:
         # (e.g., a custom frontend or a service like Poof.io / Helio.pay)
         self.portal_url = os.getenv("PAYMENT_PORTAL_URL", "https://checkout.cyberchest.ai")
         self.trust_wallet = os.getenv("TRUST_WALLET_ADDRESS")
-        self.stripe_key = os.getenv("STRIPE_SECRET_KEY")
+        self.stripe_key = settings.stripe_secret_key
 
     async def create_payment_link(self, amount: float, user_id: str, model_id: str, user_data: Optional[Dict] = None) -> Dict[str, Any]:
         """

@@ -13,6 +13,10 @@ class IdentityVault:
         self.vault_dir = root / "branches_projects" / "headless-emulations" / "models" / model_id
         self.vault_file = self.vault_dir / ".identity_vault.json"
 
+    def lock_dna(self) -> dict:
+        """Alias for lock_identity to support sandbox validation."""
+        return self.lock_identity()
+
     def lock_identity(self) -> dict:
         """Loads existing DNA or burns new, permanent DNA for the model."""
         if self.vault_file.exists():
@@ -25,6 +29,17 @@ class IdentityVault:
         with open(self.vault_file, 'w') as f:
             json.dump(dna, f, indent=4)
         return dna
+
+    def get_fingerprint(self) -> str:
+        """Retrieves the hardware canvas ID used for device persistence."""
+        dna = self.lock_identity()
+        return dna.get("hardware", {}).get("canvas_id", "Unknown")
+
+    def health_check(self) -> str:
+        """Validates that the vault file is present and readable."""
+        if self.vault_file.exists():
+            return "INTEGRITY_OK"
+        return "VAULT_EMPTY"
 
     def _generate_dna(self) -> dict:
         """Randomizes hardware architecture for bot-detection evasion."""

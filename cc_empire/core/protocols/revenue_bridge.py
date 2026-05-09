@@ -1,10 +1,10 @@
-from core.protocols.intimacy_tracker import IntimacyTracker
+from core.protocols.fan_manager import FanManager
 from core.protocols.payment_handler import UniversalPaymentHandler
 
 class RevenueBridge:
     def __init__(self, model_id: str):
         self.model_id = model_id
-        self.tracker = IntimacyTracker(model_id)
+        self.fan_manager = FanManager()
         self.payment = UniversalPaymentHandler()
 
     async def process_successful_payment(self, user_id: str, amount: float):
@@ -12,7 +12,7 @@ class RevenueBridge:
         print(f"💰 REVENUE: Processing ${amount} from User {user_id}")
         
         # 1. Update the ledger and tier
-        await self.tracker.update_tier(user_id, amount)
+        await self.fan_manager.process_financial_transaction(user_id, self.model_id, amount)
         
         # 2. Trigger a 'Milestone' event for the model's ego memory
         from core.protocols.lifecycle_events import LifecycleEngine

@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import List, Dict
 from motor.motor_asyncio import AsyncIOMotorClient
 
-# Using absolute import from the root of the project
-import core.neural_map.router
+# Standard import for better IDE resolution
+from core.neural_map.router import NeuralMapRouter
 
 class LyraExecutive:
     def __init__(self):
@@ -14,7 +14,7 @@ class LyraExecutive:
         
         # Identity & Memory - Referencing the class through the module
         self.admin_id = "LYRA_MODEL_0"
-        self.router = core.neural_map.router.NeuralMapRouter(self.admin_id)
+        self.router = NeuralMapRouter(self.admin_id)
         
         # Delayed import to avoid circular dependency
         from core.protocols.nervous_system import NervousSystem

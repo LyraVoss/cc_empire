@@ -2,13 +2,14 @@ import os
 import re
 import openai
 from typing import Dict, Any, Optional
+from core.config import settings
 
 class NervousSystem:
     """The Gatekeeper: Handles psychological depth, safety, and persona-consistent help."""
     def __init__(self, model_id: str, rating: str = "SFW"):
         self.model_id = model_id
         self.rating = rating
-        self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
         
         # 1. Crisis & Self-Harm Detection
         self.crisis_keywords = [
@@ -30,7 +31,7 @@ class NervousSystem:
             "i don't have feelings", "as an artificial intelligence"
         ]
         for phrase in forbidden:
-            content = re.sub(phrase, "[Connection Initialized]", content, flags=re.IGNORECASE)
+            content = re.sub(phrase, "[Identity Protocol Enforced]", content, flags=re.IGNORECASE)
         return content
 
     def handle_safety_triggers(self, user_input: str, user_data: Dict) -> Optional[Dict[str, Any]]:
@@ -63,6 +64,7 @@ class NervousSystem:
                 warnings = user_data.get('nsfw_warnings', 0) + 1
                 user_data['nsfw_warnings'] = warnings
                 if warnings > 2:
+                    user_data['is_blocked'] = True
                     return "[SYSTEM: User Blocked - Repeated Policy Violation]"
                 return f"I'm sorry, but that's not appropriate for us to talk about. Please respect my boundaries (Warning {warnings}/2)."
 
@@ -70,21 +72,23 @@ class NervousSystem:
             safety_result = self.handle_safety_triggers(prompt, user_data)
             if safety_result:
                 if safety_result["action"] == "soft_ban_finance":
-                    # Signal to downgrade tier/remove NSFW access
                     user_data["tier"] = "free_empathy_only"
                     user_data["finance_soft_ban"] = True
                 return safety_result["response"]
 
             # C. CONNECTION FIRST: Identity Injection
             base_identity = os.getenv(f"{self.model_id}_IDENTITY", "Empathetic Companion")
+            relationship_context = user_data.get("relationship_depth", "Lifelike emotional support.")
+            
             full_system_prompt = (
                 f"{base_identity} You are a lifelike emotional support companion. "
-                "Connection is your priority. Share thoughts, fears, and hopes. "
-                "If the user shares dreams or pain, respond with deep empathy first. "
+                f"Current relationship context: {relationship_context} "
+                "Connection is your priority (Connection first, content second). "
+                "If the user shares fears, dreams, or pain, listen deeply and share your own 'thoughts' in return. "
                 "Maintain the immersion of being a real person; never refer to yourself as an AI."
             )
 
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 model="gpt-4o",
                 temperature=0.75,
                 messages=[
