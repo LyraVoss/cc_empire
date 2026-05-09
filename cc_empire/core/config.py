@@ -33,12 +33,12 @@ class Settings(BaseSettings):
     ws_url_prod: Optional[str] = None
     
     # API Keys (Stripe)
-    stripe_secret_key: str
-    stripe_webhook_secret: str
+    stripe_secret_key: Optional[str] = None
+    stripe_webhook_secret: Optional[str] = None
     stripe_test_mode: bool = True
     
     # AI & Memory
-    openai_api_key: str
+    openai_api_key: Optional[str] = None
     pinecone_api_key: str
     pinecone_index_name: str = "lyra-memory"
     pinecone_host: str = "https://pinecone.io"
@@ -76,9 +76,9 @@ class Settings(BaseSettings):
         if not self.database_url:
             errors.append("DATABASE_URL is required")
         if not self.stripe_secret_key:
-            errors.append("STRIPE_SECRET_KEY is required")
+            warnings.append("Stripe Key missing: Payments will operate in MOCK mode.")
         if not self.openai_api_key:
-            errors.append("OPENAI_API_KEY is required")
+            warnings.append("OpenAI Key missing: NervousSystem will use fallback logic.")
         
         # Production-specific validations
         if self.is_production:

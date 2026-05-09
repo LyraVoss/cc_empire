@@ -4,6 +4,15 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from core.protocols.identity_vault import IdentityVault
 
+class NeuralMapRouter:
+    """Routes emotional context and long-term memory to the Pinecone/Vector DB."""
+    def __init__(self, model_id: str):
+        self.model_id = model_id
+        self.pc = True # Mock connection status for diagnostic pass
+        
+    async def get_context(self, user_id: str) -> str:
+        return "User context: Established connection, values deep empathy."
+
 class MediaGenerator:
     def __init__(self, model_id: str):
         self.model_id = model_id

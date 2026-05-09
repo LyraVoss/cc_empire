@@ -1,4 +1,3 @@
-import os
 import re
 import openai
 from typing import Dict, Any, Optional
@@ -9,7 +8,11 @@ class NervousSystem:
     def __init__(self, model_id: str, rating: str = "SFW"):
         self.model_id = model_id
         self.rating = rating
-        self.client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+        
+        if settings.openai_api_key:
+            self.client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+        else:
+            self.client = None
         
         # 1. Crisis & Self-Harm Detection
         self.crisis_keywords = [
@@ -56,6 +59,9 @@ class NervousSystem:
     async def generate_vetted_thought(self, prompt: str, user_data: Dict) -> str:
         """Secure OpenAI bridge with psychological depth and safety guardrails."""
         try:
+            if not self.client:
+                return "I'm in quiet reflection mode right now. (Bootstrap Mode: API Key missing)"
+
             # A. Age & NSFW Policy
             is_minor = user_data.get('age', 0) < 18
             nsfw_intent = any(x in prompt.lower() for x in ["nude", "sex", "porn", "explicit"])
@@ -77,7 +83,7 @@ class NervousSystem:
                 return safety_result["response"]
 
             # C. CONNECTION FIRST: Identity Injection
-            base_identity = os.getenv(f"{self.model_id}_IDENTITY", "Empathetic Companion")
+            base_identity = getattr(settings, f"{self.model_id.lower()}_identity", "Empathetic Companion")
             relationship_context = user_data.get("relationship_depth", "Lifelike emotional support.")
             
             full_system_prompt = (

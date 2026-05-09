@@ -47,7 +47,19 @@ async def run_diagnostics():
         print("❌ STEP 3: Nervous System Sanitization - FAILED")
 
     # TEST D: Social Loop & Proxy Gate
-    print("⚠️ STEP 4: Social Loop - SKIPPED (Awaiting Protocol definition)")
+    try:
+        from core.protocols.worker_social import WorkerSocialProtocol
+        worker = WorkerSocialProtocol("TEST_MODEL_99")
+        # Testing the loop - it should hit the 'Halt' gate because proxies are inactive by default
+        result = await worker.execute_social_loop("twitter", "post", {"text": "Hello Hive"})
+        if result['status'] == "halt":
+            print("✅ STEP 4: Proxy Safety Gate - SUCCESS (Halted as expected)")
+        else:
+            errors.append(f"Proxy Gate failed to halt unsafe request: {result['status']}")
+            print(f"❌ STEP 4: Proxy Safety Gate - FAILED")
+    except Exception as e:
+        errors.append(f"Social Loop Error: {e}")
+        print("❌ STEP 4: Social Loop - FAILED")
 
     # FINAL REPORT
     print("\n" + "="*30)

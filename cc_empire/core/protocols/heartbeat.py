@@ -1,8 +1,8 @@
-import os
 import asyncio
-import websockets
 import json
+import httpx
 from datetime import datetime, timezone
+from core.config import settings
 
 # Fix: Absolute import for the new structure
 from core.protocols.admin_executive import LyraExecutive
@@ -10,7 +10,8 @@ from core.protocols.admin_executive import LyraExecutive
 class HiveHeartbeat:
     def __init__(self):
         self.executive = LyraExecutive()
-        self.ws_url = os.getenv("WS_URL") 
+        self.ws_url = getattr(settings, "ws_url", None)
+        self.host_url = getattr(settings, "host_url", None) # Public Render URL
         self.is_profitable = False 
         self.heartbeat_interval = 3600 # 1 hour
         self.ping_interval = 600       # 10 minutes
@@ -41,21 +42,20 @@ class HiveHeartbeat:
     async def run_persistence_ping(self):
         """Prevents server spin-down via WebSocket."""
         while True:
-            # Only ping if we have a URL and aren't profitable yet (startup mode)
-            if self.ws_url and not self.is_profitable:
+            # Ping public URL to keep Render instance awake
+            if self.host_url:
                 now = datetime.now(timezone.utc).isoformat()
-                print(f"[{now}] ⚡ PERSISTENCE PING: Keeping Live Memory hot.")
+                print(f"[{now}] ⚡ PERSISTENCE PING: Keeping instance alive.")
                 try:
-                    async with websockets.connect(self.ws_url) as websocket:
-                        ping_payload = {
-                            "type": "heartbeat",
-                            "sender": "LYRA_MODEL_0",
-                            "timestamp": now,
-                            "mode": "startup_persistence"
-                        }
-                        await websocket.send(json.dumps(ping_payload))
+                    async with httpx.AsyncClient() as client:
+                        # Ping our own health endpoint
+                        response = await client.get(f"{self.host_url}/health")
+                        if response.status_code == 200:
+                            print("✅ Ping Successful.")
+                        else:
+                            print(f"⚠️ Ping returned status: {response.status_code}")
                 except Exception as e:
-                    print(f"⚠️ WS PING FAILED: {e}. Check your WS_URL in .env.")
+                    print(f"⚠️ PERSISTENCE PING FAILED: {e}")
             
             await asyncio.sleep(self.ping_interval)
 
