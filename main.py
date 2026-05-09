@@ -1,4 +1,12 @@
+import os
+import sys
 import asyncio
+
+# Ensure the project root is in sys.path for production imports
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
 from fastapi import FastAPI
 from cc_empire.core.config import settings
 from cc_empire.core.protocols.heartbeat import HiveHeartbeat
