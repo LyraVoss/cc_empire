@@ -36,6 +36,9 @@ os.environ["ENVIRONMENT"] = "sandbox"
 os.environ["DEBUG"] = "true"
 os.environ["RECORDING_ENABLED"] = "false"
 
+# Ensure sub-processes (like uvicorn reloader) can find the root package
+os.environ["PYTHONPATH"] = os.pathsep.join([str(ROOT_DIR), os.environ.get("PYTHONPATH", "")])
+
 from cc_empire.core.config import settings
 
 def setup_logging(app_name: str, debug: bool = True):
