@@ -43,9 +43,11 @@ class Settings(BaseSettings):
     
     # AI & Memory
     openai_api_key: Optional[str] = None
-    pinecone_api_key: str
-    pinecone_index_name: str = "lyra-memory"
-    pinecone_host: str = "https://pinecone.io"
+    pinecone_api_key: Optional[str] = None
+    pinecone_index_name: Optional[str] = "lyra-memory"
+    
+    # MongoDB Atlas Vector Search
+    mongodb_vector_index_name: str = "vector_index"
     
     # Voice
     elevenlabs_api_key: str

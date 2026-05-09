@@ -1,17 +1,47 @@
 import os
 import requests
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
+from motor.motor_asyncio import AsyncIOMotorClient
+from cc_empire.core.config import settings
 from cc_empire.core.protocols.identity_vault import IdentityVault
 
 class NeuralMapRouter:
     """Routes emotional context and long-term memory to the Pinecone/Vector DB."""
     def __init__(self, model_id: str):
         self.model_id = model_id
-        self.pc = True # Mock connection status for diagnostic pass
+        self.client = AsyncIOMotorClient(settings.database_url)
+        self.db = self.client.get_database("CyberChest_Hive")
+        self.collection = self.db.long_term_memory
+        self.pc = True  # Maintained for diagnostic pass compatibility
         
-    async def get_context(self, user_id: str) -> str:
-        return "User context: Established connection, values deep empathy."
+    async def get_context(self, user_id: str, query_vector: Optional[List[float]] = None) -> str:
+        """
+        Uses MongoDB Atlas Vector Search to find relevant memories.
+        If no vector is provided (bootstrap mode), returns a default persona context.
+        """
+        if not query_vector:
+            return "User context: Established connection, values deep empathy."
+
+        pipeline = [
+            {
+                "$vectorSearch": {
+                    "index": settings.mongodb_vector_index_name,
+                    "path": "embedding",
+                    "queryVector": query_vector,
+                    "numCandidates": 100,
+                    "limit": 3
+                }
+            },
+            {"$match": {"user_id": user_id, "model_id": self.model_id}}
+        ]
+        
+        results = await self.collection.aggregate(pipeline).to_list(length=3)
+        if not results:
+            return "No specific past context found. Treat as a continuing warm connection."
+            
+        context = " ".join([r.get("content", "") for r in results])
+        return f"Past interaction context: {context}"
 
 class MediaGenerator:
     def __init__(self, model_id: str):
