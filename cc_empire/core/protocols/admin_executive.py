@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timezone
 from typing import List, Dict
 from motor.motor_asyncio import AsyncIOMotorClient
+from core.config import settings
 
 # Standard import for better IDE resolution
 from core.neural_map.router import NeuralMapRouter
@@ -9,7 +10,7 @@ from core.neural_map.router import NeuralMapRouter
 class LyraExecutive:
     def __init__(self):
         # Database Connection
-        self.client = AsyncIOMotorClient(os.getenv("DATABASE_URL"))
+        self.client = AsyncIOMotorClient(settings.database_url)
         self.db = self.client.get_database("CyberChest_Hive")
         
         # Identity & Memory - Referencing the class through the module
