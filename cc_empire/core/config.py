@@ -5,7 +5,7 @@ Handles environment loading, validation, and secure defaults.
 import os
 import logging
 from typing import Optional
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from enum import Enum
 
 logger = logging.getLogger(__name__)
@@ -61,10 +61,11 @@ class Settings(BaseSettings):
     # CORS (Production whitelist)
     allowed_origins: str = "http://localhost:3000"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore"
+    )
     
     @property
     def cors_origins(self) -> list:
@@ -82,8 +83,10 @@ class Settings(BaseSettings):
         warnings = []
         
         # Critical validations
-        if not self.database_url:
+        if not self.database_url or not self.database_url.strip():
             errors.append("DATABASE_URL is required")
+        elif not (self.database_url.startswith("mongodb://") or self.database_url.startswith("mongodb+srv://")):
+            errors.append("DATABASE_URL must begin with 'mongodb://' or 'mongodb+srv://'")
         if not self.stripe_secret_key:
             warnings.append("Stripe Key missing: Payments will operate in MOCK mode.")
         if not self.openai_api_key:
