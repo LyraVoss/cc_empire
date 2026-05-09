@@ -1,5 +1,5 @@
-from core.protocols.fan_manager import FanManager
-from core.protocols.payment_handler import UniversalPaymentHandler
+from cc_empire.core.protocols.fan_manager import FanManager
+from cc_empire.core.protocols.payment_handler import UniversalPaymentHandler
 
 class RevenueBridge:
     def __init__(self, model_id: str):
@@ -15,6 +15,6 @@ class RevenueBridge:
         await self.fan_manager.process_financial_transaction(user_id, self.model_id, amount)
         
         # 2. Trigger a 'Milestone' event for the model's ego memory
-        from core.protocols.lifecycle_events import LifecycleEngine
+        from cc_empire.core.protocols.lifecycle_events import LifecycleEngine
         lifecycle = LifecycleEngine(self.model_id)
         lifecycle.trigger_event()

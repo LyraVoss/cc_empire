@@ -1,6 +1,6 @@
 from typing import Dict, Any
-from core.protocols.nervous_system import NervousSystem
-from core.protocols.admin_executive import LyraExecutive
+from cc_empire.core.protocols.nervous_system import NervousSystem
+from cc_empire.core.protocols.admin_executive import LyraExecutive
 
 class WorkerSocialProtocol:
     """Handles autonomous social media interactions and content vetting."""

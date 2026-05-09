@@ -2,10 +2,10 @@ import asyncio
 import json
 import httpx
 from datetime import datetime, timezone
-from core.config import settings
+from cc_empire.core.config import settings
 
 # Fix: Absolute import for the new structure
-from core.protocols.admin_executive import LyraExecutive
+from cc_empire.core.protocols.admin_executive import LyraExecutive
 
 class HiveHeartbeat:
     def __init__(self):

@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     stripe_secret_key: Optional[str] = None
     stripe_webhook_secret: Optional[str] = None
     stripe_test_mode: bool = True
+
+    # Crypto Wallets (for delegated payments)
+    master_crypto_seed: Optional[str] = None # For HD wallet derivation
+    default_crypto_currency: str = "ETH"
     
     # AI & Memory
     openai_api_key: Optional[str] = None

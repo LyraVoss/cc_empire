@@ -2,8 +2,10 @@ import os
 import sys
 import asyncio
 
-# 1. Path Verification: Ensures VSCode sees your new architecture
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+# 1. Project Root Verification: Ensures the 'cc_empire' package is discoverable
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 async def run_diagnostics():
     print("🧪 EMPIRE DIAGNOSTIC STARTING...\n")
@@ -12,9 +14,9 @@ async def run_diagnostics():
 
     # TEST A: Importing the CNS (Protocols)
     try:
-        from core.protocols.identity_vault import IdentityVault
-        from core.protocols.nervous_system import NervousSystem
-        from core.config import settings
+        from cc_empire.core.protocols.identity_vault import IdentityVault
+        from cc_empire.core.protocols.nervous_system import NervousSystem
+        from cc_empire.core.config import settings
         print("✅ STEP 1: Protocol Import Logic - SUCCESS")
     except ImportError as e:
         errors.append(f"Import Error: {e}")
@@ -48,7 +50,7 @@ async def run_diagnostics():
 
     # TEST D: Social Loop & Proxy Gate
     try:
-        from core.protocols.worker_social import WorkerSocialProtocol
+        from cc_empire.core.protocols.worker_social import WorkerSocialProtocol
         worker = WorkerSocialProtocol("TEST_MODEL_99")
         # Testing the loop - it should hit the 'Halt' gate because proxies are inactive by default
         result = await worker.execute_social_loop("twitter", "post", {"text": "Hello Hive"})

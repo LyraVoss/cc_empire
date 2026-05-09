@@ -1,11 +1,11 @@
 from datetime import datetime, timezone
 from typing import List, Dict
 from motor.motor_asyncio import AsyncIOMotorClient
-from core.config import settings
+from cc_empire.core.config import settings
 
 # Standard import for better IDE resolution
-from core.neural_map.router import NeuralMapRouter
-from core.protocols.nervous_system import NervousSystem
+from cc_empire.core.neural_map.router import NeuralMapRouter
+from cc_empire.core.protocols.nervous_system import NervousSystem
 
 class LyraExecutive:
     def __init__(self):

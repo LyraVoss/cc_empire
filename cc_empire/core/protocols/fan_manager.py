@@ -2,7 +2,7 @@ import os
 from typing import Dict, Any, Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime, timezone
-from core.config import settings
+from cc_empire.core.config import settings
 
 class FanManager:
     """

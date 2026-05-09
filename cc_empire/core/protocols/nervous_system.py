@@ -1,7 +1,7 @@
 import re
 import openai
 from typing import Dict, Any, Optional
-from core.config import settings
+from cc_empire.core.config import settings
 
 class NervousSystem:
     """The Gatekeeper: Handles psychological depth, safety, and persona-consistent help."""
