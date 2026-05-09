@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     debug: bool = False
     port: int = 8000
     host: str = "0.0.0.0"
+    host_url: Optional[str] = None
     
     # Database
     database_url: str
@@ -45,6 +46,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     pinecone_api_key: Optional[str] = None
     pinecone_index_name: Optional[str] = "lyra-memory"
+    pinecone_host: Optional[str] = None
     
     # MongoDB Atlas Vector Search
     mongodb_vector_index_name: str = "vector_index"
@@ -62,6 +64,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"
     
     @property
     def cors_origins(self) -> list:
