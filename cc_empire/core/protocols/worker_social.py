@@ -8,6 +8,8 @@ from typing import Dict
 # Integration: Using the updated absolute paths for our new structure
 from core.protocols.identity_vault import IdentityVault
 from core.protocols.nervous_system import NervousSystem
+from core.protocols.media_generator import MediaGenerator
+from core.protocols.lifecycle_events import LifecycleEngine
 
 class WorkerSocialProtocol:
     def __init__(self, model_id: str):
@@ -17,6 +19,8 @@ class WorkerSocialProtocol:
         # Updated to match our new lock_identity method
         self.dna = self.vault.lock_identity()
         self.ns = NervousSystem(model_id)
+        self.media_gen = MediaGenerator(model_id)
+        self.lifecycle = LifecycleEngine(model_id)
         
         # Pulling hardware fingerprint for browser/app headers
         self.hw = self.dna.get("hardware", {})
@@ -25,8 +29,23 @@ class WorkerSocialProtocol:
             "Accept-Language": "en-US,en;q=0.9",
             "X-Device-Resolution": self.hw.get("resolution", "1920x1080")
         }
+        self.geo = self.dna.get("geolocational", {})
 
-    def simulate_human_delay(self, action_type: str = "default"):
+    async def trigger_autonomous_post(self, platform: str = "twitter"):
+        """Autonomous loop: Event -> Media -> Post"""
+        # 1. Generate a Life Event (Ego Memory)
+        event = self.lifecycle.trigger_event()
+        description = event.get("content", "A day in the life.")
+
+        # 2. Generate matching media
+        print(f"[{self.model_id}] 🎨 Autonomously generating media for: {description}")
+        image_result = await self.media_gen.generate_image(description)
+        
+        # 3. Finalize Post
+        content_data = {"text": description, "media_url": image_result.get("url")}
+        return await self.execute_social_loop(platform, "post", content_data)
+
+    async def simulate_human_delay(self, action_type: str = "default"):
         """Adds randomized jitter to prevent 'superhuman' speed detection."""
         delays = {
             "post": (60, 300),      # 1-5 mins prep time
@@ -37,8 +56,7 @@ class WorkerSocialProtocol:
         low, high = delays.get(action_type, delays["default"])
         sleep_time = random.uniform(low, high)
         print(f"[{self.model_id}] ⏳ Human-simulated delay: {sleep_time:.2f}s")
-        # Note: In an async loop, we'd ideally use await asyncio.sleep
-        time.sleep(sleep_time)
+        await asyncio.sleep(sleep_time)
 
     async def execute_social_loop(self, platform: str, task_type: str, content_data: Dict):
         """The main engine for daily worker social interactions."""
@@ -55,7 +73,7 @@ class WorkerSocialProtocol:
         clean_content = self.ns.sanitize(raw_text)
         
         # 3. Execution
-        self.simulate_human_delay("scroll" if task_type == "engage" else "post")
+        await self.simulate_human_delay("scroll" if task_type == "engage" else "post")
 
         if platform == "twitter":
             return await self._post_to_x(clean_content)
@@ -66,7 +84,9 @@ class WorkerSocialProtocol:
 
     async def _post_to_x(self, text: str):
         """Logic for posting to X with device persistence."""
-        print(f"[{self.model_id}] 🐦 Posting to X using fingerprint: {self.hw.get('canvas_id')}")
+        print(f"[{self.model_id}] 🐦 Posting to X...")
+        print(f"📍 Location: {self.geo.get('city')}")
+        print(f"💻 Device: {self.hw.get('user_agent')}")
         # Logic for Tweepy/Playwright goes here once proxies are restored
         return {"status": "success", "platform": "x", "content": text[:20] + "..."}
 

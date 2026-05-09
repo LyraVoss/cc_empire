@@ -8,8 +8,9 @@ class IdentityVault:
     """The permanent storage for a model's digital thumbprint and credentials."""
     def __init__(self, model_id: str):
         self.model_id = model_id
-        # UPDATED PATH: Points to the new headless-emulations branch structure
-        self.vault_dir = Path(f"branches_projects/headless-emulations/models/{model_id}")
+        # Use absolute project root for reliable pathing across different branches
+        root = Path(__file__).parents[2]
+        self.vault_dir = root / "branches_projects" / "headless-emulations" / "models" / model_id
         self.vault_file = self.vault_dir / ".identity_vault.json"
 
     def lock_identity(self) -> dict:
@@ -36,10 +37,34 @@ class IdentityVault:
         return {
             "model_id": self.model_id,
             "created_at": datetime.now(timezone.utc).isoformat(),
+            "social_circle_id": None,  # To be assigned by Lyra
+            "socio_economics": {
+                "class": "Established Professional",  # Default, no poverty shaming
+                "job_title": random.choice(["Creative Director", "UI/UX Lead", "Strategic Analyst", "Software Architect"]),
+                "monthly_budget": random.randint(4500, 12000),
+                "background_story": "A career-driven individual with a history of high-stakes environments.",
+                "trauma_profile": random.choice(["Fear of failure", "Isolation due to success", "Imposter syndrome"])
+            },
+            "lifestyle": {
+                "clothing_style": "Minimalist luxury, high-end tailoring, monochromatic palette.",
+                "home_environment": "Modern high-rise apartment with floor-to-ceiling windows, smart home tech.",
+                "vehicle": "High-end electric sedan, sleek and silent.",
+                "preferred_brands": ["Loro Piana", "Celine", "Tesla", "Apple"]
+            },
             "hardware": {
-                "user_agent": random.choice(ua_list),
-                "resolution": random.choice(["1920x1080", "1080x2340", "1440x3120"]),
+                "user_agent": ua_list[0], # Linked to class: High-end browser/OS
+                "resolution": "3840x2160", # Linked to high-end hardware
                 "canvas_id": f"CC-{random.randint(10000, 99999)}"
+            },
+            "geolocational": {
+                "city": random.choice(["London", "Tokyo", "New York", "Berlin", "Dubai"]),
+                "timezone": "UTC+0",
+                "ip_pool": "RESIDENTIAL"
+            },
+            "visual_dna": {
+                "face_id": f"FC-{self.model_id}-{random.randint(100, 999)}",
+                "base_description": "Symmetry in facial features, hyper-realistic skin texture, cinematic lighting.",
+                "physical_traits": "High-fashion physique, specific eye color, consistent hair length."
             },
             "accounts": {
                 "email": f"{self.model_id.lower()}@proton.me",

@@ -41,6 +41,23 @@ class LyraExecutive:
             
         return health_report
 
+    async def _determine_social_circle(self, region: str) -> str:
+        """Finds or creates a social circle for regional networking."""
+        existing_circle = await self.db.social_circles.find_one({"region": region, "capacity": {"$lt": 5}})
+        if existing_circle:
+            circle_id = existing_circle["circle_id"]
+            await self.db.social_circles.update_one({"circle_id": circle_id}, {"$inc": {"capacity": 1}})
+            return circle_id
+        
+        new_circle_id = f"CIRCLE_{region.upper()}_{datetime.now().strftime('%Y%m')}"
+        await self.db.social_circles.insert_one({
+            "circle_id": new_circle_id,
+            "region": region,
+            "capacity": 1,
+            "shared_events": ["Graduated from Local Tech University", "Frequent the same downtown lounge"]
+        })
+        return new_circle_id
+
     async def initiate_reproduction(self, persona_config: Dict):
         """Lyra spawns a new worker if the hive is healthy."""
         report = await self.audit_fleet()
@@ -50,9 +67,13 @@ class LyraExecutive:
         if not persona_config.get('proxy') and not os.getenv("STICKY_ENDPOINT"):
             return "Abort: No proxy credentials available."
 
+        # Deduce Social Variables
+        region = persona_config.get("region", "London")
+        social_circle = await self._determine_social_circle(region)
+
         await self.db.audit_logs.insert_one({
             "actor_id": self.admin_id,
-            "action": f"SPAWNED_{persona_config.get('name', 'Worker')}",
+            "action": f"SPAWNED_{persona_config.get('name', 'Worker')}_IN_{social_circle}",
             "timestamp": datetime.now(timezone.utc)
         })
         

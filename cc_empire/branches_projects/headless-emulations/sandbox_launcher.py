@@ -25,13 +25,18 @@ import asyncio
 import logging
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent))
+# Set up system paths for module discovery
+ROOT_DIR = Path(__file__).parents[2]
+BRANCH_DIR = Path(__file__).parent
+sys.path.append(str(ROOT_DIR))
+sys.path.append(str(BRANCH_DIR))
 
 # Set sandbox environment
 os.environ["ENVIRONMENT"] = "sandbox"
 os.environ["DEBUG"] = "true"
 os.environ["RECORDING_ENABLED"] = "false"
+
+from core.config import settings
 
 from src.logger import setup_logging
 from src.health import HealthCheck
@@ -166,9 +171,9 @@ async def main():
     import uvicorn
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
+        host=settings.host,
+        port=settings.port,
+        reload=settings.debug,
         log_level="info"
     )
 
