@@ -12,6 +12,21 @@ async def run_diagnostics():
     
     errors = []
 
+    # PRE-CHECK: Dependency Integrity
+    try:
+        import pymongo
+        import motor
+        from packaging import version
+        
+        # PyMongo 4.x removed cursor_shared which breaks Motor < 3.0
+        if version.parse(pymongo.__version__) >= version.parse("4.0.0") and \
+           version.parse(motor.__version__) < version.parse("3.0.0"):
+            errors.append(f"Dependency Conflict: motor {motor.__version__} is incompatible with pymongo {pymongo.__version__}. Upgrade motor: 'pip install -U motor'")
+            print("⚠️  CRITICAL: Database Driver Incompatibility Detected")
+    except ImportError:
+        # packaging might not be installed, skipping verbose check
+        pass
+
     # TEST A: Importing the CNS (Protocols)
     try:
         from cc_empire.core.protocols.identity_vault import IdentityVault
@@ -49,6 +64,15 @@ async def run_diagnostics():
         print("❌ STEP 3: Nervous System Sanitization - FAILED")
 
     # TEST D: Social Loop & Proxy Gate
+    try:
+        from cc_empire.core.protocols.worker_social import WorkerSocialProtocol
+    except ModuleNotFoundError as e:
+        if "pymongo.cursor_shared" in str(e):
+            msg = "Motor/PyMongo version mismatch. Run: pip install \"motor>=3.3.1\""
+            errors.append(msg)
+            print(f"❌ STEP 4: Social Loop - FAILED ({msg})")
+            return # Stop here as DB drivers are broken
+            
     try:
         from cc_empire.core.protocols.worker_social import WorkerSocialProtocol
         worker = WorkerSocialProtocol("TEST_MODEL_99")
