@@ -26,7 +26,7 @@ import logging
 from pathlib import Path
 
 # Set up system paths for module discovery
-ROOT_DIR = Path(__file__).parents[2]
+ROOT_DIR = Path(__file__).parents[3]
 BRANCH_DIR = Path(__file__).parent
 sys.path.append(str(ROOT_DIR))
 sys.path.append(str(BRANCH_DIR))
@@ -36,11 +36,11 @@ os.environ["ENVIRONMENT"] = "sandbox"
 os.environ["DEBUG"] = "true"
 os.environ["RECORDING_ENABLED"] = "false"
 
-from core.config import settings
+from cc_empire.core.config import settings
 
-from src.logger import setup_logging
-from src.health import HealthCheck
-from core.protocols.identity_vault import IdentityVault
+from cc_empire.src.logger import setup_logging
+from cc_empire.src.health import HealthCheck
+from cc_empire.core.protocols.identity_vault import IdentityVault
 
 # Stubs for missing sub-systems to resolve Pylance errors
 class BrainEngine:
