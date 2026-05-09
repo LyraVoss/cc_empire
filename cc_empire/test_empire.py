@@ -66,17 +66,13 @@ async def run_diagnostics():
     # TEST D: Social Loop & Proxy Gate
     try:
         from cc_empire.core.protocols.worker_social import WorkerSocialProtocol
+        worker = WorkerSocialProtocol("TEST_MODEL_99")
     except ModuleNotFoundError as e:
         if "pymongo.cursor_shared" in str(e):
             msg = "Motor/PyMongo version mismatch. Run: pip install \"motor>=3.3.1\""
             errors.append(msg)
             print(f"❌ STEP 4: Social Loop - FAILED ({msg})")
             return # Stop here as DB drivers are broken
-            
-    try:
-        from cc_empire.core.protocols.worker_social import WorkerSocialProtocol
-        worker = WorkerSocialProtocol("TEST_MODEL_99")
-        # Testing the loop - it should hit the 'Halt' gate because proxies are inactive by default
         result = await worker.execute_social_loop("twitter", "post", {"text": "Hello Hive"})
         if result['status'] == "halt":
             print("✅ STEP 4: Proxy Safety Gate - SUCCESS (Halted as expected)")
