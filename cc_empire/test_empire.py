@@ -20,8 +20,8 @@ async def run_diagnostics():
         
         # PyMongo 4.x removed cursor_shared which breaks Motor < 3.0
         if version.parse(pymongo.__version__) >= version.parse("4.0.0") and \
-           version.parse(motor.__version__) < version.parse("3.0.0"):
-            errors.append(f"Dependency Conflict: motor {motor.__version__} is incompatible with pymongo {pymongo.__version__}. Upgrade motor: 'pip install -U motor'")
+           version.parse(motor.version) < version.parse("3.0.0"):
+            errors.append(f"Dependency Conflict: motor {motor.version} is incompatible with pymongo {pymongo.__version__}. Upgrade motor: 'pip install -U motor'")
             print("⚠️  CRITICAL: Database Driver Incompatibility Detected")
     except ImportError:
         # packaging might not be installed, skipping verbose check
