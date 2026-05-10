@@ -112,10 +112,17 @@ try:
     settings = Settings()
     launch_validation = settings.validate_launch()
     
+    # Detect if we are in a build environment (Render, CI, etc.)
+    # Render sets RENDER_BUILD_STEP during the build phase.
+    is_build = os.getenv("RENDER_BUILD_STEP") == "true" or os.getenv("CI") == "true"
+
     if not launch_validation["valid"]:
-        logger.error(f"Configuration validation failed: {launch_validation['errors']}")
-        error_details = " | ".join(launch_validation["errors"])
-        raise ValueError(f"Invalid configuration: {error_details}")
+        if is_build:
+            logger.warning(f"Configuration validation failed during build step (ignoring): {launch_validation['errors']}")
+        else:
+            logger.error(f"Configuration validation failed: {launch_validation['errors']}")
+            error_details = " | ".join(launch_validation["errors"])
+            raise ValueError(f"Invalid configuration: {error_details}")
     
     if launch_validation["warnings"]:
         for warning in launch_validation["warnings"]:
