@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     host_url: Optional[str] = None
     
     # Database
-    database_url: str
+    database_url: Optional[str] = None
     
     # WebSocket
     ws_url: str = "ws://localhost:8000/ws"
@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     mongodb_vector_index_name: str = "vector_index"
     
     # Voice
-    elevenlabs_api_key: str
+    elevenlabs_api_key: Optional[str] = None
     elevenlabs_voice_id: str = "21m0d2f4vM7BC8vhJBPp"  # Default: Rachel
     
     # Network
