@@ -114,7 +114,11 @@ try:
     
     # Detect if we are in a build environment (Render, CI, etc.)
     # Render sets RENDER_BUILD_STEP during the build phase.
-    is_build = os.getenv("RENDER_BUILD_STEP") == "true" or os.getenv("CI") == "true"
+    is_build = any([
+        os.getenv("RENDER_BUILD_STEP") == "true",
+        os.getenv("CI") == "true",
+        (os.getenv("RENDER") == "true" and not os.getenv("DATABASE_URL"))
+    ])
 
     if not launch_validation["valid"]:
         if is_build:
