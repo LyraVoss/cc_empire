@@ -117,12 +117,15 @@ try:
     is_build = any([
         os.getenv("RENDER_BUILD_STEP") == "true",
         os.getenv("CI") == "true",
-        (os.getenv("RENDER") == "true" and not os.getenv("DATABASE_URL"))
+        (os.getenv("RENDER") == "true" and not launch_validation["valid"])
     ])
 
     if not launch_validation["valid"]:
         if is_build:
             logger.warning(f"Configuration validation failed during build step (ignoring): {launch_validation['errors']}")
+            # Prevent pymongo.errors.InvalidURI during build/import steps
+            if not settings.database_url or not settings.database_url.startswith("mongodb"):
+                settings.database_url = "mongodb://localhost:27017/build_placeholder"
         else:
             logger.error(f"Configuration validation failed: {launch_validation['errors']}")
             error_details = " | ".join(launch_validation["errors"])
