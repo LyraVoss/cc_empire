@@ -114,7 +114,8 @@ try:
     
     if not launch_validation["valid"]:
         logger.error(f"Configuration validation failed: {launch_validation['errors']}")
-        raise ValueError("Invalid configuration - see errors above")
+        error_details = " | ".join(launch_validation["errors"])
+        raise ValueError(f"Invalid configuration: {error_details}")
     
     if launch_validation["warnings"]:
         for warning in launch_validation["warnings"]:
