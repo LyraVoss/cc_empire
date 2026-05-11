@@ -1,0 +1,18 @@
+# Build Artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+venv/
+.venv/
+
+# Local Secrets & Logs
+.env
+logs/
+media/audio/
+
+# Git & IDE
+.git
+.gitignore
+.vscode/

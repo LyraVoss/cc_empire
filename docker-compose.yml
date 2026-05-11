@@ -1,0 +1,25 @@
+# Docker Compose V2 specification (version tag is now optional/deprecated)
+services:
+  cc-hive:
+    build: .
+    container_name: cc_hive_prod
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./media:/app/media
+      - ./logs:/app/logs
+    command: ["./hive"]
+    depends_on:
+      - mongo_db
+
+  mongo_db:
+    image: mongo:latest
+    container_name: cc_mongo
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

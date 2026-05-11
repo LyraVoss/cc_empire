@@ -1,1 +1,0 @@
-# Modular communication and safety protocols
