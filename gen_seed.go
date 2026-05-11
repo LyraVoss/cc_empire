@@ -1,9 +1,9 @@
-package internal
 package main
 
 import (
 	"fmt"
 	"log"
+
 	"github.com/tyler-smith/go-bip39"
 )
 
